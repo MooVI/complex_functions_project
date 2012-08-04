@@ -256,6 +256,16 @@ CasUnaryFunction::CasUnaryFunction (const char* iFunction, int size,std::string 
 	
 }
 
+void CasUnaryFunction::createFunction (std::string iFunction,std::string iName,bool * success,InputOutputMaster * inIO){ 
+	create (iFunction.c_str(),iFunction.size(),iName,success,inIO);
+	
+}
+
+void CasUnaryFunction::createFunction (const char* iFunction, int size,std::string iName, bool * success,InputOutputMaster * inIO ){ 
+	create (iFunction,size, iName, success,inIO);
+	
+}
+
 void CasUnaryFunction::create (const char* iFunction,int size,std::string iName, bool * success,InputOutputMaster * inIO){
 	std::vector<int> outIdentifiers; bool dummy;
 	Name=iName;

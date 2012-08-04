@@ -1,4 +1,3 @@
-#pragma once
 #include "Library.h"
 #include "Operators.h"
 #include "Functions.h"
