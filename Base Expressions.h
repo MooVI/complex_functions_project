@@ -1,6 +1,6 @@
 #pragma once
 #include "Expression.h"
-
+namespace CAS {
 class Constant:public Expression{
 protected:
 	int ccName; complex<double> dcValue; std::string scName;bool Greek;
@@ -63,3 +63,4 @@ void print(std::stringstream * ssOutput);
 	
 
 };
+}

@@ -1,6 +1,6 @@
 #include "TreeWalker.h"
 #include <algorithm>
-
+namespace CAS {
 typedef std::vector<int> IntContainer;
 typedef IntContainer::iterator IntIterator;
 
@@ -27,7 +27,7 @@ int TreeWalker::findVariables (Expression * Input, std::vector<int> * outIdentif
 	return n;
 }
 
-
+}
 
 
 

@@ -1,6 +1,6 @@
 #include "Functions.h"
 #include "math.h"
-
+namespace CAS {
 //Exponential
 		Expression *Exponential::getDerivative (Expression * peInput){
 		Expression * ret= Create::createFunction (EXP,peInput);
@@ -139,3 +139,4 @@ void NaturalLogarithm::create (Expression ** peOutput,Expression *peInput, int c
 			*peOutput=peDummy;}}
 	Tanh::Tanh(Expression *peInput, int cfInName):Function (peInput){cfName=cfInName;
 	}
+}

@@ -1,6 +1,6 @@
 #pragma once
 #include "TreeWalker.h"
-
+namespace CAS {
 class InputOutputMaster:public Create {
 private:
 	char hTest [MAXSIZE];int cRead;
@@ -31,7 +31,7 @@ public:
 	InputOutputMaster * IO; Expression * UnaryFunction; int VariableIdentifier; bool newIO;
 	complex<double> evaluateAt (complex<double> InputValue);
 	complex<double> evaluateNthDerviativeAt (complex<double> InputValue,int N);
-        CasUnaryFunction (){};
+        CasUnaryFunction (){IO=NULL;newIO=false; UnaryFunction=NULL;};
 	CasUnaryFunction (std::string iFunction,std::string iName="Function",bool * success=NULL,InputOutputMaster * inIO=NULL);
 	CasUnaryFunction (const char * iFunction,int size,std::string iName="Function", bool * success=NULL,InputOutputMaster * inIO=NULL);
         void createFunction (std::string iFunction,std::string iName="Function",bool * success=NULL,InputOutputMaster * inIO=NULL);
@@ -57,3 +57,4 @@ inline complex<double> CasUnaryFunction::operator ()(complex<double> x){
                 
                 
 void setCinVariables(InputOutputMaster * IOMaster);
+}

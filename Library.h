@@ -3,6 +3,7 @@
 #include <iostream>
 #include <complex>
 #include "Expression.h"
+namespace CAS {
 using std::complex;
 template <typename T> int sgn(T val)
 {
@@ -115,3 +116,4 @@ public:
 };
 
 bool isGreek (std::string inName);
+}

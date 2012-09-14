@@ -1,5 +1,6 @@
 
 #include "Base Expressions.h"
+namespace CAS {
 //Constant
  complex<double>  Constant::evaluate () {return dcValue;}
 bool Constant::getInput (ExpPtrVector * Inputs){return false;}
@@ -100,4 +101,4 @@ bool  Function::differentiate (Expression ** peOutput,int cvWithRespectTo){
                     return true;}
 		else *peOutput=NULL;
 		return false;}
-		
+}		

@@ -1,7 +1,6 @@
 #pragma once
 #include "Base Expressions.h"
-
-
+namespace CAS {
 class Multiplication:public Operator{
 public:
 	complex<double>  evaluate ();
@@ -73,3 +72,4 @@ public:
 	static void create (Expression ** peOutput,Expression *peInput1,Expression *peInput2, int coInName);
 	LessThan(Expression *peInput1,Expression *peInput2, int coInName);
 };
+}

@@ -1,6 +1,6 @@
 #include "Operators.h"
 #include "math.h"
-
+namespace CAS {
 //Multiplication
 
 complex<double> Multiplication::evaluate() {
@@ -330,3 +330,4 @@ LessThan::LessThan(Expression *peInput1, Expression *peInput2, int coInName) : O
     coName = coInName;
 };
 
+}

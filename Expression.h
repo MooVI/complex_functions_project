@@ -3,7 +3,7 @@
 #include <vector>
 #include <complex>
 #include "Library.h"
-
+namespace CAS {
 
 class Expression;
 typedef std::vector<Expression*>   ExpPtrVector;
@@ -56,3 +56,4 @@ void glbArrayCopy (Mytype  To [],Mytype From [],int cLength){
 		To[cIter]=From[cIter];
 	}}
 
+}

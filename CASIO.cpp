@@ -1,27 +1,29 @@
 
 #include "CAS IO.h"
 #include "PhysicalConstants.h"
+namespace CAS {
 
-
-
-
-bool InputOutputMaster::checkFunction (Expression ** peOutput,int cEnd) {
-	int cIdent;
-	char hFunction [8];int cLength=0;
-	for (;cLength<7&&!(hTest [cRead+cLength]=='(');cLength++){
-		hFunction [cLength]=hTest [cRead+cLength];}
-	hFunction [cLength]='\0';
-	std::string compare= hFunction;
-	for (cIdent=0;cIdent<MAXFUNCTIONS;cIdent++){
-		if(asFunctions [cIdent]==compare) break;}
-	if (cIdent==MAXFUNCTIONS) return false;
-	int cCloseBracket=findClosingBracket(cRead+cLength,cEnd);
-	Printable ** ppBracket=new Printable *;
-	if(!(convertToPrintable (cRead+cLength+1,cCloseBracket,ppBracket))) return false;
-	*peOutput=static_cast<Expression*> (*ppBracket);
-	cRead=cCloseBracket;
-	*peOutput=Create::createFunction (cIdent,*peOutput);
-	return true;}
+bool InputOutputMaster::checkFunction(Expression ** peOutput, int cEnd) {
+    int cIdent;
+    char hFunction [8];
+    int cLength = 0;
+    for (; cLength < 7 && !(hTest [cRead + cLength] == '('); cLength++) {
+        hFunction [cLength] = hTest [cRead + cLength];
+    }
+    hFunction [cLength] = '\0';
+    std::string compare = hFunction;
+    for (cIdent = 0; cIdent < MAXFUNCTIONS; cIdent++) {
+        if (asFunctions [cIdent] == compare) break;
+    }
+    if (cIdent == MAXFUNCTIONS) return false;
+    int cCloseBracket = findClosingBracket(cRead + cLength, cEnd);
+    Printable ** ppBracket = new Printable *;
+    if (!(convertToPrintable(cRead + cLength + 1, cCloseBracket, ppBracket))) return false;
+    *peOutput = static_cast<Expression*> (*ppBracket);
+    cRead = cCloseBracket;
+    *peOutput = Create::createFunction(cIdent, *peOutput);
+    return true;
+}
 
 bool InputOutputMaster::checkNamedConstant (Expression ** peOutput,int cEnd) {
 	char hFunction [8];int cLength=1;
@@ -170,193 +172,204 @@ bool InputOutputMaster::convertToPrintable (int cStart, int cEnd, Printable ** p
 			else if(checkFunction (peMultiplyBy,cEnd)) ;
 			else if(cAscii==45) {checkMinus (peMultiplyBy,cEnd);}//-
                         else if (cAscii==105) {checkImaginary (peMultiplyBy);}//i
-			else checkVariable (cAscii,peMultiplyBy);
-			checkForPostFunctions (peMultiplyBy);
-			if (bFirst) {*peProduct=*peMultiplyBy; bFirst=false;}
-			else{ *peProduct=createOperator (MULTIPLY, *peProduct,*peMultiplyBy);}}
-			}
-			*ppOutput=static_cast<Printable*> (*peProduct);
-			//delete peProduct;delete peMultiplyBy; //? I get an error with this in, but should it not be there?
-			return true;}
-
-void InputOutputMaster::setVariables (complex<double> dInVar []){
-		glbArrayCopy< complex<double> > (Variable::dvValues,dInVar,cNumVar);
-	};
-
-void InputOutputMaster::setVariable (complex<double> dInVar,int IDENT){
-	Variable::dvValues [IDENT]=dInVar;
-}
-
-int InputOutputMaster::getNumVar (){return cNumVar;}
-
-char InputOutputMaster::getVariableName (int cIdent){return ahVariables [cIdent] [0];}
-
-bool InputOutputMaster::convertInputString (const char *  hInput ,int cSize, Printable ** ppOutput)
-		
-		{	int cTest=0;
-			for (int cInput=0;cInput<cSize;cInput++){
-				if (!(hInput[cInput]==' ')) {hTest[cTest]=hInput[cInput];cTest++;}}//Extract spaces;
-			for (int cInput=cTest;cInput<MAXSIZE;cInput++){
-				hTest[cInput]=0;}//Delete rest of hTest so it does not mess with anything else;
-			//std::cout<<std::endl;
-			if(convertToPrintable (0,cTest,ppOutput)) return true;
-			
-		
-			return false;
-			
-		}
-
-bool InputOutputMaster::convertToOutputString (std::string * sOutput, Printable * ppInput){
-	std::stringstream ssOutput;
-	ppInput->print(&ssOutput);
-	*sOutput=ssOutput.str();
-	return true;
-}
-
-InputOutputMaster::InputOutputMaster (){cNumVar=0;}
-
-void setCinVariables(InputOutputMaster * IOMaster){ 
-	complex<double> dInValues [MAXVARIABLES];
-	std::string sInput;
-	for (int cIter=0;cIter<IOMaster->getNumVar();cIter++){
-	std::cout<<IOMaster->getVariableName (cIter)<<" = ";
-	std::getline(std::cin,sInput);
-	std::stringstream ssConverter(sInput);
-	ssConverter>>dInValues [cIter];}
-	IOMaster->setVariables (dInValues);}
-
-complex<double> CasUnaryFunction::evaluateAt (complex<double> InputValue){
-	IO->setVariable (InputValue,VariableIdentifier);
-	return UnaryFunction->evaluate ();
-}
-
-
-complex<double> CasUnaryFunction::evaluateNthDerviativeAt (complex<double> InputValue,int N){
-	Expression ** derivative=new Expression *;
-	*derivative = UnaryFunction;
-	for (int i=0;i<N;i++){
-		(*derivative)->differentiate (derivative,VariableIdentifier);
-	}
-	IO->setVariable (InputValue,VariableIdentifier);
-	complex<double> ret;
-	if ((*derivative)==NULL) ret=0;
-	else ret=(*derivative)->evaluate ();
-	delete derivative;
-	return ret;
-
-}
-
-CasUnaryFunction::CasUnaryFunction (std::string iFunction,std::string iName,bool * success,InputOutputMaster * inIO){ 
-	create (iFunction.c_str(),iFunction.size(),iName,success,inIO);
-	
-}
-
-CasUnaryFunction::CasUnaryFunction (const char* iFunction, int size,std::string iName, bool * success,InputOutputMaster * inIO ){ 
-	create (iFunction,size, iName, success,inIO);
-	
-}
-
-void CasUnaryFunction::createFunction (std::string iFunction,std::string iName,bool * success,InputOutputMaster * inIO){ 
-	create (iFunction.c_str(),iFunction.size(),iName,success,inIO);
-	
-}
-
-void CasUnaryFunction::createFunction (const char* iFunction, int size,std::string iName, bool * success,InputOutputMaster * inIO ){ 
-	create (iFunction,size, iName, success,inIO);
-	
-}
-
-void CasUnaryFunction::create (const char* iFunction,int size,std::string iName, bool * success,InputOutputMaster * inIO){
-	std::vector<int> outIdentifiers; bool dummy;
-	Name=iName;
-        newIO=false;
-	if (inIO==NULL) {
-		IO = new InputOutputMaster;
-                newIO=true;
+            else checkVariable(cAscii, peMultiplyBy);
+            checkForPostFunctions(peMultiplyBy);
+            if (bFirst) {
+                *peProduct = *peMultiplyBy;
+                bFirst = false;
+            } else {
+                *peProduct = createOperator(MULTIPLY, *peProduct, *peMultiplyBy);
+            }
         }
-	else 
-		IO =inIO;
-	if (success==NULL)
-		success=&dummy;
-	Printable * pFunction;
-	if (!IO->convertInputString (iFunction,size,&pFunction)) *success=false;
-	else {
-		UnaryFunction= static_cast<Expression *> (pFunction);
-		(*success)=true;
-		if (inIO==NULL) 
-			if (IO->getNumVar ()==1)
-				VariableIdentifier=0;
-			else 
-				(*success)=false; //Not a Unary Function!
-		else if (TreeWalker::findVariables (UnaryFunction,&outIdentifiers)==1)
-			VariableIdentifier=outIdentifiers [0];
-		else
-			(*success)=false; //Not a Unary Function!
-	}
+    }
+    *ppOutput = static_cast<Printable*> (*peProduct);
+    //delete peProduct;delete peMultiplyBy; //? I get an error with this in, but should it not be there?
+    return true;
 }
 
-
-std::string CasUnaryFunction::print (int NthDerivative){
-	Expression ** derivative=new Expression *;
-	*derivative = UnaryFunction;
-	for (int i=0;i<NthDerivative;i++){
-		(*derivative)->differentiate (derivative,VariableIdentifier);
-	}
-	std::stringstream out;
-	if ((*derivative)==NULL) out<<"0";
-	else (*derivative)->print (&out);
-	if (NthDerivative>0) delete derivative;
-	return out.str ();
-
-}
-
-std::string CasUnaryFunction::latex (int NthDerivative){
-	Expression ** derivative=new Expression *;
-	*derivative = UnaryFunction;
-	for (int i=0;i<NthDerivative;i++){
-		(*derivative)->differentiate (derivative,VariableIdentifier);
-	}
-	std::stringstream out;
-	if ((*derivative)==NULL) out<<"0";
-	else {
-		out<<"$";
-		(*derivative)->latex (&out);
-		out<<"$";
-	}
-	if (NthDerivative>0) delete derivative;
-	return out.str ();
-
-}
-
-std::string CasUnaryFunction::getName (){
-	return Name;
-}
-
-std::string CasUnaryFunction::getInputVar (){
-	std::stringstream out;
-	out<<IO->getVariableName (VariableIdentifier);
-	return out.str();
-}
-
-
-CasUnaryFunction CasUnaryFunction::operator * (CasUnaryFunction A){
-	CasUnaryFunction ret = A;
-	ret.UnaryFunction= Create::createOperator (MULTIPLY,A.UnaryFunction,UnaryFunction);
-	return ret;
+void InputOutputMaster::setVariables(complex<double> dInVar []) {
+    glbArrayCopy< complex<double> > (Variable::dvValues, dInVar, cNumVar);
 };
 
-CasUnaryFunction::~CasUnaryFunction(){
-	//delete UnaryFunction;
-     //   if (newIO)
-       //     delete IO;
+void InputOutputMaster::setVariable(complex<double> dInVar, int IDENT) {
+    Variable::dvValues [IDENT] = dInVar;
 }
 
+int InputOutputMaster::getNumVar() {
+    return cNumVar;
+}
 
-	
-	
+char InputOutputMaster::getVariableName(int cIdent) {
+    return ahVariables [cIdent] [0];
+}
+
+bool InputOutputMaster::convertInputString(const char * hInput, int cSize, Printable ** ppOutput)
+ {
+    int cTest = 0;
+    for (int cInput = 0; cInput < cSize; cInput++) {
+        if (!(hInput[cInput] == ' ')) {
+            hTest[cTest] = hInput[cInput];
+            cTest++;
+        }
+    }//Extract spaces;
+    for (int cInput = cTest; cInput < MAXSIZE; cInput++) {
+        hTest[cInput] = 0;
+    }//Delete rest of hTest so it does not mess with anything else;
+    //std::cout<<std::endl;
+    if (convertToPrintable(0, cTest, ppOutput)) return true;
 
 
+    return false;
 
+}
+
+bool InputOutputMaster::convertToOutputString(std::string * sOutput, Printable * ppInput) {
+    std::stringstream ssOutput;
+    ppInput->print(&ssOutput);
+    *sOutput = ssOutput.str();
+    return true;
+}
+
+InputOutputMaster::InputOutputMaster() {
+    cNumVar = 0;
+}
+
+void setCinVariables(InputOutputMaster * IOMaster) {
+    complex<double> dInValues [MAXVARIABLES];
+    std::string sInput;
+    for (int cIter = 0; cIter < IOMaster->getNumVar(); cIter++) {
+        std::cout << IOMaster->getVariableName(cIter) << " = ";
+        std::getline(std::cin, sInput);
+        std::stringstream ssConverter(sInput);
+        ssConverter >> dInValues [cIter];
+    }
+    IOMaster->setVariables(dInValues);
+}
+
+complex<double> CasUnaryFunction::evaluateAt(complex<double> InputValue) {
+    IO->setVariable(InputValue, VariableIdentifier);
+    return UnaryFunction->evaluate();
+}
+
+complex<double> CasUnaryFunction::evaluateNthDerviativeAt(complex<double> InputValue, int N) {
+    Expression ** derivative = new Expression *;
+    *derivative = UnaryFunction;
+    for (int i = 0; i < N; i++) {
+        (*derivative)->differentiate(derivative, VariableIdentifier);
+    }
+    IO->setVariable(InputValue, VariableIdentifier);
+    complex<double> ret;
+    if ((*derivative) == NULL) ret = 0;
+    else ret = (*derivative)->evaluate();
+    delete derivative;
+    return ret;
+
+}
+
+CasUnaryFunction::CasUnaryFunction(std::string iFunction, std::string iName, bool * success, InputOutputMaster * inIO) {
+    create(iFunction.c_str(), iFunction.size(), iName, success, inIO);
+
+}
+
+CasUnaryFunction::CasUnaryFunction(const char* iFunction, int size, std::string iName, bool * success, InputOutputMaster * inIO) {
+    create(iFunction, size, iName, success, inIO);
+
+}
+
+void CasUnaryFunction::createFunction(std::string iFunction, std::string iName, bool * success, InputOutputMaster * inIO) {
+    create(iFunction.c_str(), iFunction.size(), iName, success, inIO);
+
+}
+
+void CasUnaryFunction::createFunction(const char* iFunction, int size, std::string iName, bool * success, InputOutputMaster * inIO) {
+    create(iFunction, size, iName, success, inIO);
+
+}
+
+void CasUnaryFunction::create(const char* iFunction, int size, std::string iName, bool * success, InputOutputMaster * inIO) {
+    std::vector<int> outIdentifiers;
+    bool dummy;
+    Name = iName;
+    newIO = false;
+    if (inIO == NULL) {
+        IO = new InputOutputMaster;
+        newIO = true;
+    } else
+        IO = inIO;
+    if (success == NULL)
+        success = &dummy;
+    Printable * pFunction;
+    if (!IO->convertInputString(iFunction, size, &pFunction)) *success = false;
+    else {
+        UnaryFunction = static_cast<Expression *> (pFunction);
+        (*success) = true;
+        if (inIO == NULL)
+            if (IO->getNumVar() == 1)
+                VariableIdentifier = 0;
+            else
+                (*success) = false; //Not a Unary Function!
+        else if (TreeWalker::findVariables(UnaryFunction, &outIdentifiers) == 1)
+            VariableIdentifier = outIdentifiers [0];
+        else
+            (*success) = false; //Not a Unary Function!
+    }
+}
+
+std::string CasUnaryFunction::print(int NthDerivative) {
+    Expression ** derivative = new Expression *;
+    *derivative = UnaryFunction;
+    for (int i = 0; i < NthDerivative; i++) {
+        (*derivative)->differentiate(derivative, VariableIdentifier);
+    }
+    std::stringstream out;
+    if ((*derivative) == NULL) out << "0";
+    else (*derivative)->print(&out);
+    if (NthDerivative > 0) delete derivative;
+    return out.str();
+
+}
+
+std::string CasUnaryFunction::latex(int NthDerivative) {
+    Expression ** derivative = new Expression *;
+    *derivative = UnaryFunction;
+    for (int i = 0; i < NthDerivative; i++) {
+        (*derivative)->differentiate(derivative, VariableIdentifier);
+    }
+    std::stringstream out;
+    if ((*derivative) == NULL) out << "0";
+    else {
+        out << "$";
+        (*derivative)->latex(&out);
+        out << "$";
+    }
+    if (NthDerivative > 0) delete derivative;
+    return out.str();
+
+}
+
+std::string CasUnaryFunction::getName() {
+    return Name;
+}
+
+std::string CasUnaryFunction::getInputVar() {
+    std::stringstream out;
+    out << IO->getVariableName(VariableIdentifier);
+    return out.str();
+}
+
+CasUnaryFunction CasUnaryFunction::operator *(CasUnaryFunction A) {
+    CasUnaryFunction ret = A;
+    ret.UnaryFunction = Create::createOperator(MULTIPLY, A.UnaryFunction, UnaryFunction);
+    return ret;
+};
+
+CasUnaryFunction::~CasUnaryFunction() {
+    //delete UnaryFunction;
+    //   if (newIO)
+    //     delete IO;
+}
+
+}
 	
 
 	

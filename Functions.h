@@ -1,7 +1,6 @@
 #pragma once
 #include "Base Expressions.h"
-
-
+namespace CAS {
 class Exponential:public Function{
 public:
 	Expression * getDerivative (Expression * peInput);
@@ -86,3 +85,4 @@ public:
 	Tanh(Expression *peInput, int cfInName);
 };
 
+}

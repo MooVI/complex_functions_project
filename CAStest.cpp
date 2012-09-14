@@ -5,6 +5,7 @@
 #include <complex>
 #include "PhysicalConstants.h"
 #include "CAS IO.h"
+#include "../../../Plotting/Plotter/Plotter.h"
 using std::cout;
 using namespace std;
 
@@ -29,15 +30,39 @@ using namespace std;
 int main() {
     
     while (true) {
+        bool success; CasUnaryFunction f;
+        while (!success){
+        std::string fname;
+        std::cout<<"Enter function: ";
+        std::getline(std::cin,fname);
+        f.createFunction(fname,fname,&success);
+        };
+        int N= 100; vector<double> ox (N*N),oy(N*N),oz(N*N);
+        double x=0,y=0;double boundx=4;double boundy=4;
+        for (int i = 0; i < N; i++) {
+            x+= boundx/ ((double) N);
+            y = -boundy/2.0;
+            for (int j = 0; j < N; j++) {
+                
+                y+= boundy/ ((double) N);
+                complex<double> z = f (std::complex<double> (x,y));
+                oz[i*N+j]=z.real();
+                ox[i*N+j]=x;
+                oy[i*N+j]=y;
+                
+            }}
+        ScatterPlotter plotter;
+        plotter.plot(ox,oy,oz);
         std::string hInput;
         std::cout << "Enter a unary function, friend, and I will try to work out what the hell you're saying.\n";
-        bool success;
+        
         stringstream test;
-        int x = 9;
+     
         test<< "sin("<<x<<"x)";
         std::string tester =test.str();
         std::getline(std::cin, hInput);
-        CasUnaryFunction UnaryTest(hInput,"Function", &success);
+        CasUnaryFunction UnaryTest;
+        UnaryTest.createFunction(hInput,hInput, &success);
         if (success) {
             std::cout << UnaryTest.latex() << std::endl;
             std::cout << UnaryTest.latex(1) << std::endl;

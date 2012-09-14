@@ -1,7 +1,7 @@
 #include "Library.h"
 #include "Operators.h"
 #include "Functions.h"
-
+namespace CAS {
 bool isGreek (std::string inName){
 	if (inName=="theta"||inName=="phi"||inName=="psi"||
 		inName=="Theta"||inName=="Phi"||inName=="Psi"||
@@ -130,3 +130,4 @@ void ConCreateFunctions::Coth(Expression ** peOutput, Expression *peInput, int c
     ConCreateFunctions::OneOver(peOutput, Create::createFunction(TANH, peInput), cfInName);
 }
 
+}
